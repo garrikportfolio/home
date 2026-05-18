@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Garrik Olindan — Social Media Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #080808;
+    --offwhite: #f0ede6;
+    --lime: #c8f135;
+    --orange: #ff5c1a;
+    --muted: #a8a49c;
+    --card: #111110;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--offwhite);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--lime);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 40px; height: 40px;
+    border: 1px solid var(--lime);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease, width 0.25s ease, height 0.25s ease, opacity 0.2s;
+    opacity: 0.5;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 500;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 3rem;
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.12em;
+    color: var(--offwhite);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--lime); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--lime); }
+  .nav-cta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--lime);
+    padding: 0.55rem 1.4rem;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .nav-cta:hover { background: #d8ff45; transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 3rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(8rem, 22vw, 22rem);
+    color: rgba(255,255,255,0.022);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: -0.02em;
+    user-select: none;
+  }
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 1.2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4.5rem, 13vw, 13rem);
+    line-height: 0.9;
+    letter-spacing: -0.01em;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.35s forwards;
+  }
+  .hero-title .accent { color: var(--lime); }
+  .hero-title .stroke {
+    -webkit-text-stroke: 1px var(--offwhite);
+    color: transparent;
+  }
+  .hero-sub {
+    max-width: 480px;
+    font-size: 1.05rem;
+    color: var(--muted);
+    margin-top: 2rem;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.55s forwards;
+  }
+  .hero-bottom {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-top: 3.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.75s forwards;
+  }
+  .hero-stats { display: flex; gap: 3.5rem; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    line-height: 1;
+    color: var(--lime);
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+  .scroll-hint {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+    writing-mode: vertical-rl;
+    gap: 0.8rem;
+  }
+  .scroll-line {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, var(--lime), transparent);
+    animation: scrollPulse 1.8s ease-in-out infinite;
+  }
+
+  /* Diagonal divider */
+  .diagonal-cut {
+    width: 100%; height: 80px;
+    background: var(--offwhite);
+    clip-path: polygon(0 100%, 100% 0, 100% 100%);
+  }
+
+  /* ── SERVICES ── */
+  #services {
+    background: var(--offwhite);
+    color: var(--black);
+    padding: 6rem 3rem;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    line-height: 0.95;
+    color: var(--black);
+    margin-bottom: 4rem;
+  }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: rgba(0,0,0,0.12);
+    border: 1px solid rgba(0,0,0,0.12);
+  }
+  .service-card {
+    background: var(--offwhite);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .service-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: var(--orange);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+  }
+  .service-card:hover { background: #e8e4db; }
+  .service-card:hover::after { transform: scaleX(1); }
+  .service-icon {
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+    display: block;
+  }
+  .service-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.04em;
+    color: var(--black);
+    margin-bottom: 0.7rem;
+  }
+  .service-card p {
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 300;
+    line-height: 1.65;
+  }
+
+  /* ── CASE STUDIES ── */
+  #cases {
+    padding: 7rem 3rem;
+    background: var(--black);
+  }
+  .cases-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 4rem;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .case-cards { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .case-card {
+    background: var(--card);
+    padding: 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .case-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--lime);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.4s ease;
+  }
+  .case-card:hover { background: #161614; }
+  .case-card:hover::before { transform: scaleY(1); }
+  .case-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    position: absolute; right: 2rem; top: 1.5rem;
+  }
+  .case-client {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 0.6rem;
+  }
+  .case-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--offwhite);
+  }
+  .case-problem {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+  .case-strategy {
+    font-size: 0.88rem;
+    color: var(--offwhite);
+    font-weight: 400;
+    line-height: 1.6;
+  }
+  .case-strategy strong {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block; margin-bottom: 0.5rem;
+  }
+  .case-result {
+    text-align: right;
+  }
+  .result-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.2rem;
+    line-height: 1;
+    color: var(--lime);
+  }
+  .result-detail {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
+
+  /* ── CREATOR SECTION ── */
+  #creator {
+    background: var(--orange);
+    padding: 6rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  #creator::before {
+    content: 'CREATOR';
+    position: absolute;
+    right: -2rem; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(6rem, 18vw, 16rem);
+    color: rgba(0,0,0,0.1);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .creator-inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+    position: relative; z-index: 1;
+  }
+  #creator .section-label { color: rgba(0,0,0,0.5); }
+  #creator .section-title { color: var(--black); margin-bottom: 1.5rem; }
+  .creator-desc {
+    font-size: 1.05rem;
+    color: rgba(0,0,0,0.75);
+    font-weight: 300;
+    line-height: 1.75;
+  }
+  .creator-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+  .creator-stat {
+    background: rgba(255,255,255,0.12);
+    padding: 2rem;
+    text-align: center;
+    backdrop-filter: blur(4px);
+  }
+  .creator-stat .num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    color: var(--black);
+    line-height: 1;
+  }
+  .creator-stat .lbl {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,0.55);
+    margin-top: 0.3rem;
+  }
+
+  /* ── SKILLS ── */
+  #skills {
+    background: var(--black);
+    padding: 7rem 3rem;
+  }
+  .skills-grid {
+    display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 3rem;
+  }
+  .skill-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.6rem;
+    border: 1px solid var(--border);
+    color: var(--offwhite);
+    transition: all 0.25s;
+    cursor: default;
+  }
+  .skill-tag:hover {
+    background: var(--lime);
+    color: var(--black);
+    border-color: var(--lime);
+    transform: translateY(-2px);
+  }
+
+  /* ── MARQUEE ── */
+  .marquee-wrap {
+    background: var(--lime);
+    overflow: hidden;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+  .marquee-track {
+    display: flex; gap: 0; white-space: nowrap;
+    animation: marquee 18s linear infinite;
+  }
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.2em;
+    color: var(--black);
+    padding: 0 3rem;
+    opacity: 0.9;
+  }
+  .marquee-dot {
+    color: var(--orange);
+    padding: 0;
+  }
+
+  /* ── CONTACT ── */
+  #contact {
+    background: var(--offwhite);
+    color: var(--black);
+    padding: 7rem 3rem;
+  }
+  .contact-inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start;
+  }
+  #contact .section-label { color: var(--orange); }
+  .contact-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 0.9;
+    color: var(--black);
+    margin-top: 0.5rem;
+  }
+  .contact-title .stroke {
+    -webkit-text-stroke: 1.5px var(--black);
+    color: transparent;
+  }
+  .contact-desc {
+    font-size: 0.95rem;
+    color: #666;
+    font-weight: 300;
+    line-height: 1.75;
+    margin-top: 1.5rem;
+    max-width: 380px;
+  }
+  .contact-items { display: flex; flex-direction: column; gap: 2rem; margin-top: 1rem; }
+  .contact-item {
+    padding: 1.8rem 2rem;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .contact-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+  .contact-item-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 0.5rem;
+  }
+  .contact-item-value {
+    font-size: 1rem;
+    color: var(--black);
+    font-weight: 500;
+    word-break: break-all;
+  }
+  .cta-button {
+    display: inline-block;
+    margin-top: 2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    color: var(--offwhite);
+    background: var(--black);
+    padding: 1rem 2.5rem;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .cta-button:hover { background: var(--orange); transform: translateY(-2px); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--black);
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  footer .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+    color: var(--offwhite);
+  }
+  footer .logo span { color: var(--lime); }
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.75s ease, transform 0.75s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links { display: none; }
+    #hero { padding: 0 1.5rem 4rem; }
+    #services, #cases, #creator, #skills, #contact { padding: 4rem 1.5rem; }
+    .case-card { grid-template-columns: 1fr; gap: 1.5rem; }
+    .case-num { display: none; }
+    .case-result { text-align: left; }
+    .creator-inner { grid-template-columns: 1fr; }
+    .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+    footer { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">GO<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#cases">Results</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="mailto:garrikolindan@gmail.com" class="nav-cta">Hire Me</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-text">SMM</div>
+  <div class="hero-eyebrow">Social Media Manager · Philippines</div>
+  <h1 class="hero-title">
+    GARRIK<br>
+    <span class="stroke">OLIN</span><span class="accent">DAN</span>
+  </h1>
+  <p class="hero-sub">Turning content into views, followers, and income. I don't just post — I build systems that grow brands on autopilot.</p>
+  <div class="hero-bottom">
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">100K+</div>
+        <div class="stat-label">Subscribers grown</div>
+      </div>
+      <div>
+        <div class="stat-num">₱50K</div>
+        <div class="stat-label">Weekly revenue driven</div>
+      </div>
+      <div>
+        <div class="stat-num">500K</div>
+        <div class="stat-label">Daily views (own channel)</div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      Scroll
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">YouTube Growth</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Viral Content</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Retention Optimization</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Reels Strategy</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Revenue Conversion</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Thumbnail CTR</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Audience Engagement</span><span class="marquee-item marquee-dot">✦</span>
+    <!-- duplicate for seamless loop -->
+    <span class="marquee-item">YouTube Growth</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Viral Content</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Retention Optimization</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Reels Strategy</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Revenue Conversion</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Thumbnail CTR</span><span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Audience Engagement</span><span class="marquee-item marquee-dot">✦</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-label reveal">What I Do</div>
+  <h2 class="section-title reveal">FOUR WAYS<br>I GROW BRANDS</h2>
+  <div class="services-grid">
+    <div class="service-card reveal reveal-delay-1">
+      <span class="service-icon">🎯</span>
+      <h3>Viral Content Strategy</h3>
+      <p>Research-backed trend analysis and content frameworks engineered for maximum reach and shareability on YouTube, Instagram, and TikTok.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <span class="service-icon">📊</span>
+      <h3>Analytics & Growth Optimization</h3>
+      <p>Deep-dive into retention curves, CTR, and algorithm behavior to continuously improve performance — not just post and pray.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-3">
+      <span class="service-icon">🎬</span>
+      <h3>Video Editing & Thumbnails</h3>
+      <p>High-impact edits and thumbnails that stop the scroll, spike click-through rate, and hold viewers until the end.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-4">
+      <span class="service-icon">💬</span>
+      <h3>Audience Engagement & Conversion</h3>
+      <p>Turning passive followers into an engaged community — and that community into paying customers through precision targeting and reply strategy.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDIES -->
+<section id="cases">
+  <div class="cases-header">
+    <div>
+      <div class="section-label reveal">Proven Results</div>
+      <h2 class="section-title reveal" style="color:var(--offwhite);">CASE<br>STUDIES</h2>
+    </div>
+  </div>
+
+  <div class="case-cards">
+
+    <div class="case-card reveal">
+      <div class="case-num">01</div>
+      <div>
+        <div class="case-client">YouTube</div>
+        <h3>Crown Sisters</h3>
+        <p class="case-problem">Problem: Plateau at 73K subscribers with slow growth velocity</p>
+      </div>
+      <div class="case-strategy">
+        <strong>Strategy</strong>
+        Thumbnail redesign for higher CTR, retention hooks in the first 30 seconds, and trend-aligned topic selection.
+      </div>
+      <div class="case-result">
+        <div class="result-big">+27K</div>
+        <div class="result-detail">73K → 100K Subs<br>in 30 days</div>
+      </div>
+    </div>
+
+    <div class="case-card reveal">
+      <div class="case-num">02</div>
+      <div>
+        <div class="case-client">YouTube</div>
+        <h3>Ace Dhaniel PH</h3>
+        <p class="case-problem">Problem: Stagnant channel with inconsistent growth and low visibility</p>
+      </div>
+      <div class="case-strategy">
+        <strong>Strategy</strong>
+        Full content optimization audit, niche trend research, and a consistent upload system built around the algorithm.
+      </div>
+      <div class="case-result">
+        <div class="result-big">5×</div>
+        <div class="result-detail">20K → 100K Subs<br>in 6 months</div>
+      </div>
+    </div>
+
+    <div class="case-card reveal">
+      <div class="case-num">03</div>
+      <div>
+        <div class="case-client">Instagram</div>
+        <h3>MedievalMNL</h3>
+        <p class="case-problem">Problem: Strong following but low conversion to actual revenue</p>
+      </div>
+      <div class="case-strategy">
+        <strong>Strategy</strong>
+        Reels-first content calendar, engagement reply sequences, and audience retargeting to drive direct sales.
+      </div>
+      <div class="case-result">
+        <div class="result-big">₱50K</div>
+        <div class="result-detail">Weekly Revenue<br>Content-driven</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CREATOR -->
+<section id="creator">
+  <div class="creator-inner">
+    <div>
+      <div class="section-label">Beyond Management</div>
+      <h2 class="section-title reveal">I'M A<br>CREATOR<br>TOO.</h2>
+      <p class="creator-desc reveal">
+        I don't just manage pages — I've built my own. Running a gaming content channel in the MLBB niche, I pull 100K–500K views per day, attracted sponsors, and caught the attention of pro teams. That means I understand both sides of the equation: what creators need and what brands want.
+      </p>
+    </div>
+    <div class="creator-stats reveal">
+      <div class="creator-stat">
+        <div class="num">500K</div>
+        <div class="lbl">Views/day (peak)</div>
+      </div>
+      <div class="creator-stat">
+        <div class="num">16M+</div>
+        <div class="lbl">Total views</div>
+      </div>
+      <div class="creator-stat">
+        <div class="num">MLBB</div>
+        <div class="lbl">Gaming niche</div>
+      </div>
+      <div class="creator-stat">
+        <div class="num">✦</div>
+        <div class="lbl">Sponsor deals secured</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label reveal">Technical Expertise</div>
+  <h2 class="section-title reveal" style="color:var(--offwhite);">SKILLS &<br>TOOLS</h2>
+  <div class="skills-grid reveal">
+    <div class="skill-tag">YouTube Retention Optimization</div>
+    <div class="skill-tag">Viral Hook Writing</div>
+    <div class="skill-tag">Thumbnail CTR Optimization</div>
+    <div class="skill-tag">TikTok / Reels Growth</div>
+    <div class="skill-tag">Audience Conversion Strategy</div>
+    <div class="skill-tag">Analytics & Reporting</div>
+    <div class="skill-tag">Video Editing</div>
+    <div class="skill-tag">Trend Research</div>
+    <div class="skill-tag">Content Calendar Planning</div>
+    <div class="skill-tag">Engagement Automation</div>
+    <div class="skill-tag">Niche Positioning</div>
+    <div class="skill-tag">Algorithm Optimization</div>
+  </div>
+</section>
+
+<!-- MARQUEE 2 -->
+<div class="marquee-wrap" style="background: var(--orange);">
+  <div class="marquee-track" style="animation-direction: reverse; animation-duration: 22s;">
+    <span class="marquee-item">Open for Collaborations</span><span class="marquee-item marquee-dot" style="color: var(--black);">✦</span>
+    <span class="marquee-item">Available for Full-Time Roles</span><span class="marquee-item marquee-dot" style="color: var(--black);">✦</span>
+    <span class="marquee-item">Philippines-Based</span><span class="marquee-item marquee-dot" style="color: var(--black);">✦</span>
+    <span class="marquee-item">Remote-Ready</span><span class="marquee-item marquee-dot" style="color: var(--black);">✦</span>
+    <span class="marquee-item">Open for Collaborations</span><span class="marquee-item marquee-dot" style="color: var(--black);">✦</span>
+    <span class="marquee-item">Available for Full-Time Roles</span><span class="marquee-item marquee-dot" style="color: var(--black);">✦</span>
+    <span class="marquee-item">Philippines-Based</span><span class="marquee-item marquee-dot" style="color: var(--black);">✦</span>
+    <span class="marquee-item">Remote-Ready</span><span class="marquee-item marquee-dot" style="color: var(--black);">✦</span>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div>
+      <div class="section-label reveal">Get In Touch</div>
+      <h2 class="contact-title reveal">LET'S<br>GROW<br><span class="stroke">YOUR</span><br>PAGE.</h2>
+      <p class="contact-desc reveal">
+        Whether you need a full-time Social Media Manager or a strategic collaborator for a specific campaign — I'm ready to deliver results from day one.
+      </p>
+    </div>
+    <div>
+      <div class="contact-items">
+        <div class="contact-item reveal">
+          <div class="contact-item-label">Email</div>
+          <div class="contact-item-value">garrikolindan@gmail.com</div>
+        </div>
+        <div class="contact-item reveal reveal-delay-1">
+          <div class="contact-item-label">Phone / WhatsApp</div>
+          <div class="contact-item-value">+63 985 365 2149</div>
+        </div>
+        <div class="contact-item reveal reveal-delay-2">
+          <div class="contact-item-label">Sample Work</div>
+          <div class="contact-item-value" style="font-size: 0.85rem; word-break: break-all;">
+            <a href="https://drive.google.com/drive/folders/1QuIFh5vxbB" target="_blank" style="color: var(--orange); text-decoration: none;">View Sample Edits on Google Drive ↗</a>
+          </div>
+        </div>
+      </div>
+      <a href="mailto:garrikolindan@gmail.com" class="cta-button reveal reveal-delay-3">Send Me a Message ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">GO<span>.</span> — Garrik Olindan</div>
+  <p>© 2025 · Social Media Manager · Philippines</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  (function loop() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+    ring.style.left   = rx + 'px';
+    ring.style.top    = ry + 'px';
+    requestAnimationFrame(loop);
+  })();
+  document.querySelectorAll('a, button, .skill-tag, .service-card, .case-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '20px'; cursor.style.height = '20px';
+      ring.style.width = '60px'; ring.style.height = '60px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '12px'; cursor.style.height = '12px';
+      ring.style.width = '40px'; ring.style.height = '40px';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
